@@ -2970,15 +2970,15 @@ func handleGetVoteInfo(s *rpcServer, cmd interface{}, closeChan <-chan struct{})
 
 	// We don't fail, we try to return the totals for this version.
 	var err error
+	vi, err := chain.GetVoteInfo(&snapshot.Hash, c.Version)
+	if err != nil {
+		return nil, rpcInvalidError("vote version: %v is not supported,\nerr: %v", c.Version, err)
+	}
+
 	result.TotalVotes, err = chain.CountVoteVersion(c.Version)
 	if err != nil {
 		return nil, rpcInternalError(err.Error(),
 			"could not count voter versions")
-	}
-
-	vi, err := chain.GetVoteInfo(&snapshot.Hash, c.Version)
-	if err != nil {
-		return nil, rpcInternalError(err.Error(), "could not obtain vote info")
 	}
 
 	result.Agendas = make([]types.Agenda, 0, len(vi.Agendas))
